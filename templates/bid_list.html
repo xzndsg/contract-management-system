@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}投标文件 - 合同管理系统{% endblock %}
+{% block page_title %}投标文件管理{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body" style="padding-bottom:0">
+        <form class="filter-bar" method="get" action="{{ url_for('bid_list') }}">
+            <input type="text" name="keyword" placeholder="搜索投标文件标题" value="{{ keyword }}" style="width:220px">
+            <button class="btn btn-primary" type="submit">查询</button>
+            <div style="flex:1"></div>
+            <a class="btn btn-success" href="{{ url_for('bid_upload') }}">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a1 1 0 011 1v4h4a1 1 0 110 2H9v4a1 1 0 11-2 0V9H3a1 1 0 010-2h4V3a1 1 0 011-1z"/></svg>
+                上传投标文件
+            </a>
+        </form>
+    </div>
+    <div class="card-body" style="padding-top:16px">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:56px">ID</th><th>投标文件标题</th><th>原始文件</th>
+                    <th>状态</th><th>上传时间</th><th style="width:260px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bids %}
+                <tr>
+                    <td>{{ b.id }}</td>
+                    <td style="color:var(--text);font-weight:500">{{ b.title }}</td>
+                    <td>{{ b.original_filename }}</td>
+                    <td><span class="tag tag-{% if b.status == 'generated' %}approved{% elif b.status == 'extracted' %}pending{% elif b.status == 'ocred' %}category{% else %}archived{% endif %}">{{ b.status_name }}</span></td>
+                    <td>{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if b.status == 'uploaded' %}
+                        <form method="post" action="{{ url_for('bid_extract', bid_id=b.id) }}" style="display:inline">
+                            <button class="btn btn-warning btn-sm" type="submit">OCR + 提取</button>
+                        </form>
+                        {% endif %}
+                        {% if b.status in ['extracted', 'generated', 'ocred'] %}
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('bid_template', bid_id=b.id) }}">模板生成</a>
+                        {% endif %}
+                        {% if b.status == 'generated' %}
+                        <a class="btn btn-default btn-sm" href="{{ url_for('bid_view', bid_id=b.id) }}" target="_blank">查看投标文档</a>
+                        {% endif %}
+                        <form method="post" action="{{ url_for('bid_delete', bid_id=b.id) }}" style="display:inline"
+                              onsubmit="return confirm('确定删除？')">
+                            <button class="btn btn-danger btn-sm" type="submit">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="empty">
+                    暂无投标文件，点击右上角上传开始完整流程
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

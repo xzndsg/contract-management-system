@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}AI 生成范本 - 合同管理系统{% endblock %}
+{% block page_title %}AI 生成合同范本{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:{% if generated %}420px 1fr{% else %}560px{% endif %};gap:20px;{% if not generated %}max-width:560px;margin:0 auto{% endif %}">
+    <div class="card">
+        <div class="card-title">
+            <span style="display:inline-flex;align-items:center;gap:8px">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#1677ff"><path d="M12 2l2.1 5.6L20 9l-4.3 4 1 6-4.7-2.6L7.3 19l1-6L4 9l5.9-1.4L12 2z"/></svg>
+                DeepSeek 智能起草
+            </span>
+        </div>
+        <div class="card-body">
+            <form method="post" id="genForm">
+                <div class="form-group">
+                    <label><span class="req">*</span>合同分类</label>
+                    <select name="category" required>
+                        <option value="">请选择分类</option>
+                        {% for key, name in categories.items() %}
+                        <option value="{{ key }}" {% if form.category == key %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><span class="req">*</span>行业类型</label>
+                    <input type="text" name="industry" list="industryList" required
+                           placeholder="选择或输入行业，如：信息技术" value="{{ form.industry }}">
+                    <datalist id="industryList">
+                        {% for ind in industries %}
+                        <option value="{{ ind }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label>合同名称</label>
+                    <input type="text" name="title" placeholder="留空则自动命名" value="{{ form.title }}">
+                </div>
+                <div class="form-group">
+                    <label>额外要求</label>
+                    <textarea name="extra" rows="3" placeholder="选填，如：合同期限三年、含保密条款、分期付款等">{{ form.extra }}</textarea>
+                </div>
+                <button class="btn btn-primary" type="submit" id="genBtn" style="width:100%">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.1 5.6L20 9l-4.3 4 1 6-4.7-2.6L7.3 19l1-6L4 9l5.9-1.4L12 2z"/></svg>
+                    生成合同范本
+                </button>
+                <div class="form-tip" style="text-align:center;margin-top:10px">由 DeepSeek 大模型生成，通常需要 10~60 秒</div>
+            </form>
+        </div>
+    </div>
+
+    {% if generated %}
+    <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+            <span>生成结果（可直接编辑修改）</span>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('save_generated') }}" id="saveForm">
+                <input type="hidden" name="category" value="{{ form.category }}">
+                <input type="hidden" name="industry" value="{{ form.industry }}">
+                <div class="form-group">
+                    <label>合同/范本名称</label>
+                    <input type="text" name="title" value="{{ generated.title }}">
+                </div>
+                <div class="form-group">
+                    <label>内容（可编辑，【】内为结构化变量）</label>
+                    <textarea name="content" rows="20" style="font-family:Consolas,Monaco,monospace;
+                              font-size:13px;line-height:1.8;white-space:pre-wrap">{{ generated.content }}</textarea>
+                    <div class="form-tip">提示：带【】的占位符会自动识别为结构化变量，保存为范本后可快速填写生成合同</div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                    <button class="btn btn-success" type="submit">保存为合同（进入审核）</button>
+                    <button class="btn btn-primary" type="submit" formaction="{{ url_for('template_new') }}"
+                            formmethod="post">保存为固定范本</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('genForm').addEventListener('submit', function () {
+    var btn = document.getElementById('genBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'AI 正在起草中，请稍候…';
+});
+</script>
+{% endblock %}

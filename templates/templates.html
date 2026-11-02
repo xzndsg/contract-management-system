@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}固定范本 - 合同管理系统{% endblock %}
+{% block page_title %}固定范本{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body" style="padding-bottom:0">
+        <form class="filter-bar" method="get" action="{{ url_for('template_list') }}">
+            <select name="category">
+                <option value="">全部分类</option>
+                {% for key, name in categories.items() %}
+                <option value="{{ key }}" {% if sel_category == key %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="keyword" placeholder="搜索范本名称" value="{{ keyword }}">
+            <button class="btn btn-primary" type="submit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z"/></svg>
+                查询
+            </button>
+            <div style="flex:1"></div>
+            <a class="btn btn-default" href="{{ url_for('template_new') }}">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a1 1 0 011 1v4h4a1 1 0 110 2H9v4a1 1 0 11-2 0V9H3a1 1 0 010-2h4V3a1 1 0 011-1z"/></svg>
+                新建范本
+            </a>
+        </form>
+    </div>
+    <div class="card-body" style="padding-top:16px">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:56px">ID</th><th>范本名称</th><th>分类</th><th>行业</th>
+                    <th>变量数</th><th>更新时间</th><th style="width:180px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in templates %}
+                <tr>
+                    <td>{{ t.id }}</td>
+                    <td style="color:var(--text);font-weight:500">{{ t.title }}</td>
+                    <td><span class="tag tag-category">{{ t.category_name }}</span></td>
+                    <td>{{ t.industry or '-' }}</td>
+                    <td><span class="tag" style="color:#0958d9;background:#e6f4ff;border-color:#91caff">{{ t.variable_list|length }} 个</span></td>
+                    <td>{{ t.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('template_use', tid=t.id) }}">使用</a>
+                        <a class="btn btn-default btn-sm" href="{{ url_for('template_edit', tid=t.id) }}">编辑</a>
+                        <form method="post" action="{{ url_for('template_delete', tid=t.id) }}" style="display:inline"
+                              onsubmit="return confirm('确定删除该范本？')">
+                            <button class="btn btn-danger btn-sm" type="submit">删除</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="#d9d9d9" style="display:block;margin:0 auto 8px"><path d="M6 2h9l5 5v13a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"/></svg>
+                    暂无固定范本，可通过 AI 生成后保存
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

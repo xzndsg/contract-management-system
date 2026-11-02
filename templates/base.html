@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}合同管理系统{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #1677ff;
+            --primary-hover: #4096ff;
+            --success: #52c41a;
+            --warning: #faad14;
+            --error: #ff4d4f;
+            --text: rgba(0, 0, 0, .88);
+            --text-secondary: rgba(0, 0, 0, .65);
+            --text-tertiary: rgba(0, 0, 0, .45);
+            --border: #d9d9d9;
+            --border-split: #f0f0f0;
+            --bg: #f5f5f5;
+            --sidebar-bg: #001529;
+            --radius: 8px;
+            --shadow: 0 1px 2px rgba(0,0,0,.03), 0 1px 6px -1px rgba(0,0,0,.02), 0 2px 4px rgba(0,0,0,.02);
+            --shadow-hover: 0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+                         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+            background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5715;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { color: var(--primary-hover); }
+
+        /* ===== 布局 ===== */
+        .layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 216px; background: var(--sidebar-bg); color: rgba(255,255,255,.65);
+            position: fixed; top: 0; bottom: 0; left: 0; display: flex; flex-direction: column;
+        }
+        .logo {
+            height: 64px; display: flex; align-items: center; padding: 0 20px;
+            color: #fff; font-size: 17px; font-weight: 600; letter-spacing: .5px;
+        }
+        .logo svg { margin-right: 10px; flex-shrink: 0; }
+        .menu { padding: 12px 8px; }
+        .menu-group {
+            padding: 12px 16px 4px; font-size: 12px; color: rgba(255,255,255,.35);
+            letter-spacing: 1px;
+        }
+        .menu-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+            border-radius: 6px; color: rgba(255,255,255,.65); font-size: 14px;
+            margin-bottom: 4px; cursor: pointer; transition: all .2s;
+        }
+        .menu-item:hover { color: #fff; }
+        .menu-item.active { background: var(--primary); color: #fff; }
+        .sidebar-footer { margin-top: auto; padding: 16px 20px; font-size: 12px; color: rgba(255,255,255,.35); }
+
+        .main { margin-left: 216px; flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .topbar {
+            height: 64px; background: #fff; box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; position: sticky; top: 0; z-index: 10;
+        }
+        .page-title { font-size: 16px; font-weight: 600; }
+        .topbar-user { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 13px; }
+        .avatar {
+            width: 30px; height: 30px; border-radius: 50%; background: var(--primary);
+            color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px;
+        }
+
+        .content { padding: 24px; flex: 1; }
+
+        /* ===== 卡片 ===== */
+        .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .card-body { padding: 24px; }
+        .card-title { font-size: 16px; font-weight: 600; padding: 16px 24px; border-bottom: 1px solid var(--border-split); }
+
+        /* ===== 按钮 ===== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 5px 16px; height: 32px; border-radius: 6px; font-size: 14px;
+            border: 1px solid transparent; cursor: pointer; transition: all .2s;
+            background: none; white-space: nowrap; line-height: 1;
+        }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 0 rgba(5,145,255,.1); }
+        .btn-primary:hover { background: var(--primary-hover); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #73d13d; color: #fff; }
+        .btn-danger { background: var(--error); color: #fff; }
+        .btn-danger:hover { background: #ff7875; color: #fff; }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-warning:hover { background: #ffc53d; color: #fff; }
+        .btn-default { background: #fff; border-color: var(--border); color: var(--text); }
+        .btn-default:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-sm { height: 26px; padding: 2px 10px; font-size: 13px; border-radius: 5px; }
+
+        /* ===== 表格 ===== */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        thead th {
+            background: #fafafa; color: var(--text); font-weight: 600;
+            padding: 14px 16px; border-bottom: 1px solid var(--border-split); text-align: left;
+            white-space: nowrap;
+        }
+        tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border-split); color: var(--text-secondary); }
+        tbody tr { transition: background .2s; }
+        tbody tr:hover { background: #fafafa; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* ===== 标签 ===== */
+        .tag {
+            display: inline-flex; align-items: center; gap: 5px; padding: 1px 9px;
+            border-radius: 4px; font-size: 12px; line-height: 20px; border: 1px solid;
+        }
+        .tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .tag-pending  { color: #d48806; background: #fffbe6; border-color: #ffe58f; }
+        .tag-approved { color: #389e0d; background: #f6ffed; border-color: #b7eb8f; }
+        .tag-archived { color: rgba(0,0,0,.65); background: #fafafa; border-color: #d9d9d9; }
+        .tag-rejected { color: #cf1322; background: #fff1f0; border-color: #ffa39e; }
+        .tag-category { color: #0958d9; background: #e6f4ff; border-color: #91caff; }
+        .tag-category::before { display: none; }
+
+        /* ===== 表单 ===== */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; }
+        label .req { color: var(--error); margin-right: 4px; }
+        input[type=text], input[type=file], select, textarea {
+            width: 100%; padding: 5px 12px; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text);
+            transition: all .2s; background: #fff;
+        }
+        input[type=text], select { height: 36px; }
+        input[type=file] { padding: 8px 12px; height: auto; }
+        textarea { resize: vertical; }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(5,145,255,.1);
+        }
+        .form-tip { margin-top: 6px; font-size: 12px; color: var(--text-tertiary); }
+
+        /* ===== 提示消息 ===== */
+        .flash {
+            padding: 9px 16px; border-radius: var(--radius); margin-bottom: 16px;
+            font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow);
+        }
+        .flash-success { background: #f6ffed; border: 1px solid #b7eb8f; color: #389e0d; }
+        .flash-error { background: #fff2f0; border: 1px solid #ffccc7; color: #cf1322; }
+
+        /* ===== 统计卡片 ===== */
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-box {
+            background: #fff; border-radius: var(--radius); padding: 20px 24px;
+            box-shadow: var(--shadow); display: flex; align-items: center; gap: 16px;
+            transition: box-shadow .2s;
+        }
+        .stat-box:hover { box-shadow: var(--shadow-hover); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stat-num { font-size: 26px; font-weight: 700; line-height: 1.2; }
+        .stat-label { font-size: 13px; color: var(--text-tertiary); margin-top: 2px; }
+
+        /* ===== 筛选栏 ===== */
+        .filter-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .filter-bar input, .filter-bar select { width: 180px; }
+        .filter-bar input[name=keyword] { width: 220px; }
+
+        /* ===== 描述列表（详情） ===== */
+        .desc-table { width: 100%; border: 1px solid var(--border-split); border-radius: var(--radius); overflow: hidden; }
+        .desc-table th, .desc-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-split); text-align: left; font-size: 14px; }
+        .desc-table th { background: #fafafa; width: 120px; color: var(--text); font-weight: 500; white-space: nowrap; }
+        .desc-table td { color: var(--text-secondary); }
+        .desc-table tr:last-child th, .desc-table tr:last-child td { border-bottom: none; }
+
+        .empty { text-align: center; color: var(--text-tertiary); padding: 48px 0; }
+
+        @media (max-width: 900px) {
+            .sidebar { width: 64px; }
+            .sidebar .menu-item span, .sidebar .logo span, .sidebar-footer { display: none; }
+            .main { margin-left: 64px; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect width="24" height="24" rx="6" fill="#1677ff"/>
+                    <path d="M8 7h8M8 12h8M8 17h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>合同管理系统</span>
+            </div>
+            <nav class="menu">
+                <div class="menu-group">业务指引</div>
+                <a class="menu-item {% if request.endpoint == 'guide' %}active{% endif %}" href="{{ url_for('guide') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    <span>业务流程</span>
+                </a>
+                <div class="menu-group">合同管理</div>
+                <a class="menu-item {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12v3H2V2zm0 5h12v3H2V7zm0 5h12v2H2v-2z"/></svg>
+                    <span>合同列表</span>
+                </a>
+                <a class="menu-item {% if request.endpoint == 'upload' %}active{% endif %}" href="{{ url_for('upload') }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a1 1 0 011 1v4h4a1 1 0 110 2H9v4a1 1 0 11-2 0V9H3a1 1 0 010-2h4V3a1 1 0 011-1z"/></svg>
+                    <span>上传合同</span>
+                </a>
+                <div class="menu-group">范本中心</div>
+                <a class="menu-item {% if request.endpoint == 'generate' %}active{% endif %}" href="{{ url_for('generate') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.1 5.6L20 9l-4.3 4 1 6-4.7-2.6L7.3 19l1-6L4 9l5.9-1.4L12 2z"/></svg>
+                    <span>AI 生成范本</span>
+                </a>
+                <a class="menu-item {% if request.endpoint == 'template_list' %}active{% endif %}" href="{{ url_for('template_list') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 3h16a1 1 0 011 1v3H3V4a1 1 0 011-1zm-1 6h18v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9zm7 3v2h4v-2h-4z"/></svg>
+                    <span>固定范本</span>
+                </a>
+                <div class="menu-group">投标系统</div>
+                <a class="menu-item {% if request.endpoint == 'bid_list' %}active{% endif %}" href="{{ url_for('bid_list') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a1 1 0 00-1 1v18a1 1 0 001 1h16a1 1 0 001-1V3a1 1 0 00-1-1zM9 18H7v-7h2v7zm4 0h-2V7h2v11zm4 0h-2v-4h2v4z"/></svg>
+                    <span>投标文件</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">Contract MS v1.0</div>
+        </aside>
+
+        <div class="main">
+            <header class="topbar">
+                <div class="page-title">{% block page_title %}合同管理{% endblock %}</div>
+                <div class="topbar-user">
+                    <span class="avatar">业</span>
+                    <span>业务员</span>
+                </div>
+            </header>
+            <main class="content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+</body>
+</html>

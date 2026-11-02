@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}使用范本 - 合同管理系统{% endblock %}
+{% block page_title %}使用范本拟定合同{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 400px;gap:20px">
+    <div class="card">
+        <div class="card-title">
+            填写变量
+            <span style="font-size:12px;color:var(--text-tertiary);font-weight:normal;margin-left:12px">
+                范本：{{ tmpl.title }}（{{ tmpl.category_name }}）
+            </span>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="form-group">
+                    <label><span class="req">*</span>合同名称</label>
+                    <input type="text" name="title" required placeholder="请输入拟定后的合同名称"
+                           value="{{ tmpl.title.replace('范本', '') }}">
+                </div>
+                {% for var in tmpl.variable_list %}
+                <div class="form-group">
+                    <label>【{{ var }}】</label>
+                    <input type="text" name="var_{{ var }}" placeholder="请输入{{ var }}">
+                </div>
+                {% else %}
+                <div class="empty">该范本未检测到【】变量，可直接保存</div>
+                {% endfor %}
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+                    <a class="btn btn-default" href="{{ url_for('template_list') }}">返回</a>
+                    <button class="btn btn-primary" type="submit">生成合同并提交审核</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">范本预览</div>
+        <div class="card-body">
+            <div style="border:1px solid var(--border-split);border-radius:8px;padding:24px;
+                        background:#fffdf7;font-size:13px;line-height:2;white-space:pre-wrap;
+                        max-height:70vh;overflow-y:auto;color:var(--text-secondary)">{{ tmpl.content }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

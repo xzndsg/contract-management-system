@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}业务指引{% endblock %}
+{% block page_title %}业务指引{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom:20px">
+    <div class="card-body">
+        <h2 style="font-size:20px;margin-bottom:8px">完整业务流程</h2>
+        <p style="color:var(--text-secondary);font-size:14px">
+            系统覆盖<strong>合同管理系统</strong>和<strong>投标系统</strong>两大模块。点击任意步骤卡片可直达对应功能页面。
+        </p>
+    </div>
+</div>
+
+<h3 style="margin-bottom:12px;font-size:15px;color:var(--text)">① 合同管理系统</h3>
+<div class="guide-flow" style="margin-bottom:28px">
+    <a href="{{ url_for('upload') }}" class="step-card">
+        <div class="step-num" style="background:#e6f4ff;color:#1677ff">1</div>
+        <div class="step-body">
+            <div class="step-title">上传合同</div>
+            <div class="step-desc">按分类（采购/建筑/服务/租赁/运输）上传 Word 或 PDF 合同文件</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('index') }}" class="step-card">
+        <div class="step-num" style="background:#fff7e6;color:#d46b08">2</div>
+        <div class="step-body">
+            <div class="step-title">智能字段提取</div>
+            <div class="step-desc">DeepSeek 自动识别合同金额、签署日期、双方名称、合同期限等 8 项关键字段</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('generate') }}" class="step-card">
+        <div class="step-num" style="background:#f6ffed;color:#389e0d">3</div>
+        <div class="step-body">
+            <div class="step-title">AI 生成 / 固定范本</div>
+            <div class="step-desc">按行业生成范本 → 保存固定范本（自动提取【】变量）→ 快速填写生成合同</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('index') }}" class="step-card">
+        <div class="step-num" style="background:#fff1f0;color:#cf1322">4</div>
+        <div class="step-body">
+            <div class="step-title">审核归档</div>
+            <div class="step-desc">业务人员在线预览审核（通过/驳回）→ 归档入库</div>
+        </div>
+        <div class="step-arrow" style="color:var(--success)">✓</div>
+    </a>
+</div>
+
+<h3 style="margin-bottom:12px;font-size:15px;color:var(--text)">② 投标系统</h3>
+<div class="guide-flow">
+    <a href="{{ url_for('bid_upload') }}" class="step-card">
+        <div class="step-num" style="background:#e6f4ff;color:#1677ff">1</div>
+        <div class="step-body">
+            <div class="step-title">上传投标文件</div>
+            <div class="step-desc">PDF / Word 格式的招标文件、投标文件</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('bid_list') }}" class="step-card">
+        <div class="step-num" style="background:#fff7e6;color:#d46b08">2</div>
+        <div class="step-body">
+            <div class="step-title">OCR 优化与识别</div>
+            <div class="step-desc">pdfplumber 本地 OCR 提取文本 → DeepSeek 结构化提取投标字段</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('bid_list') }}" class="step-card">
+        <div class="step-num" style="background:#f6ffed;color:#389e0d">3</div>
+        <div class="step-body">
+            <div class="step-title">投标信息提取</div>
+            <div class="step-desc">提取投标金额、竞标方、项目描述、明细报价等 20 项关键字段</div>
+        </div>
+        <div class="step-arrow">→</div>
+    </a>
+    <a href="{{ url_for('bid_list') }}" class="step-card">
+        <div class="step-num" style="background:#fff1f0;color:#cf1322">4</div>
+        <div class="step-body">
+            <div class="step-title">模板生成与自动化填写</div>
+            <div class="step-desc">内置规范化投标文档模板，字段自动替换，可修改补全后一键生成</div>
+        </div>
+        <div class="step-arrow" style="color:var(--success)">✓</div>
+    </a>
+</div>
+
+<style>
+.guide-flow { display: flex; flex-direction: column; gap: 12px; }
+.step-card {
+    display: flex; align-items: center; gap: 20px; background: #fff;
+    border-radius: var(--radius); padding: 18px 22px; box-shadow: var(--shadow);
+    color: inherit; transition: all .2s;
+}
+.step-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); color: inherit; }
+.step-num {
+    width: 40px; height: 40px; border-radius: 50%; font-size: 18px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-body { flex: 1; }
+.step-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.step-desc { font-size: 13px; color: var(--text-secondary); }
+.step-arrow { font-size: 20px; color: var(--text-tertiary); }
+</style>
+{% endblock %}

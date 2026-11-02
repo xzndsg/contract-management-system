@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}审核合同 - 合同管理系统{% endblock %}
+{% block page_title %}合同审核{% endblock %}
+{% block content %}
+<div style="max-width:640px;margin:0 auto">
+    <div class="card">
+        <div class="card-title">合同信息</div>
+        <div class="card-body">
+            <table class="desc-table" style="margin-bottom:24px">
+                <tr><th>合同名称</th><td style="color:var(--text);font-weight:500">{{ contract.title }}</td></tr>
+                <tr><th>分类</th><td><span class="tag tag-category">{{ contract.category_name }}</span></td></tr>
+                <tr>
+                    <th>文件</th>
+                    <td>
+                        <a href="{{ url_for('view_file', cid=contract.id) }}" target="_blank">{{ contract.original_filename }}</a>
+                        <span class="form-tip" style="margin-left:6px">点击预览</span>
+                    </td>
+                </tr>
+                <tr><th>上传人</th><td>{{ contract.uploader or '-' }}</td></tr>
+                <tr><th>上传时间</th><td>{{ contract.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+                <tr><th>当前状态</th><td><span class="tag tag-{{ contract.status }}">{{ contract.status_name }}</span></td></tr>
+                {% if contract.reviewer %}
+                <tr><th>审核人</th><td>{{ contract.reviewer }}</td></tr>
+                <tr><th>审核时间</th><td>{{ contract.reviewed_at.strftime('%Y-%m-%d %H:%M') if contract.reviewed_at else '-' }}</td></tr>
+                <tr><th>审核意见</th><td>{{ contract.review_comment or '无' }}</td></tr>
+                {% endif %}
+            </table>
+
+            {% if contract.status == 'pending' %}
+            <div style="border-top:1px solid var(--border-split);padding-top:24px">
+                <div class="card-title" style="padding:0 0 12px 0;border:none;font-size:15px">审核操作</div>
+                <form method="post">
+                    <div class="form-group">
+                        <label>审核人</label>
+                        <input type="text" name="reviewer" placeholder="业务员姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>审核意见</label>
+                        <textarea name="comment" rows="4" placeholder="请填写审核意见（选填）"></textarea>
+                    </div>
+                    <div style="display:flex;gap:10px">
+                        <button class="btn btn-success" type="submit" name="action" value="approve">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M12.2 5.2l-5.3 5.4-3.1-3.2 1.1-1.1 2 2 4.2-4.2 1.1 1.1z"/></svg>
+                            审核通过
+                        </button>
+                        <button class="btn btn-danger" type="submit" name="action" value="reject"
+                                onclick="return confirm('确定驳回该合同？')">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.8 3.8l8.4 8.4M12.2 3.8L3.8 12.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                            驳回
+                        </button>
+                        <a class="btn btn-default" href="{{ url_for('index') }}">返回</a>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div style="display:flex;gap:10px;margin-top:8px">
+                <a class="btn btn-default" href="{{ url_for('index') }}">返回</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

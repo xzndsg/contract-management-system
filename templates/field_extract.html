@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}字段提取 - {{ contract.title }}{% endblock %}
+{% block page_title %}合同智能字段提取{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:420px 1fr;gap:20px">
+    <div class="card">
+        <div class="card-title">
+            <a href="{{ url_for('index') }}" style="color:var(--text-tertiary);font-weight:normal;margin-right:8px">←</a>
+            {{ contract.title }}
+        </div>
+        <div class="card-body">
+            <table class="desc-table" style="margin-bottom:20px">
+                <tr><th>分类</th><td><span class="tag tag-category">{{ contract.category_name }}</span></td></tr>
+                <tr><th>文件</th><td><a href="{{ url_for('view_file', cid=contract.id) }}" target="_blank">{{ contract.original_filename }}</a></td></tr>
+                <tr><th>上传人</th><td>{{ contract.uploader or '-' }}</td></tr>
+                <tr><th>上传时间</th><td>{{ contract.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+            </table>
+            <form method="post" style="display:flex;gap:10px">
+                <button class="btn btn-primary" type="submit" style="flex:1">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.1 5.6L20 9l-4.3 4 1 6-4.7-2.6L7.3 19l1-6L4 9l5.9-1.4L12 2z"/></svg>
+                    {% if extraction %}重新提取{% else %}开始 AI 字段提取{% endif %}
+                </button>
+                <a class="btn btn-default" href="{{ url_for('index') }}">返回</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            提取结果
+            {% if extraction %}
+            <span style="font-size:12px;color:var(--text-tertiary);font-weight:normal;margin-left:12px">
+                共 {{ extraction.field_dict|selectattr('1')|list|length }} 项有值
+            </span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if extraction %}
+            <table class="desc-table">
+                {% for key, value in extraction.field_dict.items() %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <td style="{{ 'color:var(--text);font-weight:500' if value else 'color:var(--text-tertiary);font-style:italic' }}">
+                        {{ value if value else '未找到' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <details style="margin-top:16px">
+                <summary style="cursor:pointer;color:var(--text-secondary);font-size:13px">查看 AI 原始提取的文本（前 3000 字）</summary>
+                <div style="margin-top:8px;border:1px solid var(--border-split);border-radius:6px;padding:12px;
+                            background:#fafafa;font-size:12px;line-height:1.8;white-space:pre-wrap;max-height:300px;overflow:auto">
+{{ extraction.raw_text[:3000] }}
+                </div>
+            </details>
+            {% else %}
+            <div class="empty">
+                点击左侧"开始 AI 字段提取"按钮，DeepSeek 将自动识别合同金额、签署日期、双方主体等关键字段
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

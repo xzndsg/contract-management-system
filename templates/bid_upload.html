@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}上传投标文件{% endblock %}
+{% block page_title %}上传投标文件{% endblock %}
+{% block content %}
+<div style="max-width:560px;margin:0 auto">
+    <div class="card">
+        <div class="card-title">上传投标文件</div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label><span class="req">*</span>投标文件标题</label>
+                    <input type="text" name="title" required placeholder="如：2026年智慧城市项目投标文件">
+                </div>
+                <div class="form-group">
+                    <label>上传人</label>
+                    <input type="text" name="uploader" placeholder="请输入姓名">
+                </div>
+                <div class="form-group">
+                    <label><span class="req">*</span>投标文件（PDF 或 Word）</label>
+                    <input type="file" name="file" accept=".doc,.docx,.pdf" required>
+                    <div class="form-tip">上传后将自动进行 OCR 识别和投标信息提取</div>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                    <a class="btn btn-default" href="{{ url_for('bid_list') }}">返回</a>
+                    <button class="btn btn-success" type="submit">提交上传</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+        <div class="card-title">投标系统业务流程</div>
+        <div class="card-body">
+            <ol style="padding-left:20px;line-height:2.2;color:var(--text-secondary);font-size:13px">
+                <li>上传投标 PDF / Word 文件</li>
+                <li>点击"OCR + 提取" → 系统自动识别文本并调用 DeepSeek 提取投标字段</li>
+                <li>点击"模板生成" → 进入模板填写页，可修改/补全已提取字段</li>
+                <li>一键生成规范化投标文档</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

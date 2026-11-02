@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}上传合同 - 合同管理系统{% endblock %}
+{% block page_title %}上传合同{% endblock %}
+{% block content %}
+<div style="max-width:560px;margin:0 auto">
+    <div class="card">
+        <div class="card-title">上传合同</div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label><span class="req">*</span>合同名称</label>
+                    <input type="text" name="title" required placeholder="请输入合同名称">
+                </div>
+                <div class="form-group">
+                    <label><span class="req">*</span>合同分类</label>
+                    <select name="category" required>
+                        <option value="">请选择分类</option>
+                        {% for key, name in categories.items() %}
+                        <option value="{{ key }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>上传人</label>
+                    <input type="text" name="uploader" placeholder="请输入姓名">
+                </div>
+                <div class="form-group">
+                    <label><span class="req">*</span>合同文件</label>
+                    <input type="file" name="file" accept=".doc,.docx,.pdf" required>
+                    <div class="form-tip">支持 Word（.doc / .docx）或 PDF 格式，文件大小不超过 20 MB</div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:8px">
+                    <button class="btn btn-success" type="submit">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a1 1 0 011 1v4h4a1 1 0 110 2H9v4a1 1 0 11-2 0V9H3a1 1 0 010-2h4V3a1 1 0 011-1z"/></svg>
+                        提交上传
+                    </button>
+                    <a class="btn btn-default" href="{{ url_for('index') }}">返回</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

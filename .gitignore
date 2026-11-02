@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 数据库
+*.db
+
+# 上传文件与运行产物
+uploads/
+bids/
+*.txt
+!README.md
+
+# 环境
+.env
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
